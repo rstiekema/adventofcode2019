@@ -33,29 +33,29 @@ class OrbitMap
 	}
 	
 	
-    public function getParentObject(string $object):? string
+	public function getParentObject(string $object):? string
 	{
-        if (isset($this->objects[$object])) {
-            return $this->objects[$object]['parent'];
-        }
+		if (isset($this->objects[$object])) {
+			return $this->objects[$object]['parent'];
+		}
 
-        return null;
-    }
+		return null;
+	}
 	
 	
 	public function getAllParentObjects(string $object): array
 	{
-        $parentObjects = array();
+		$parentObjects = array();
 
-        while ($object = $this->getParentObject($object)) {
-        	$parentObjects[] = $object;
+		while ($object = $this->getParentObject($object)) {
+			$parentObjects[] = $object;
 		}
-        
-        return $parentObjects;
-    }
-    
-    
-    public function getTotalOrbits(): int
+		
+		return $parentObjects;
+	}
+	
+	
+	public function getTotalOrbits(): int
 	{
 		$total = 0;
 		
