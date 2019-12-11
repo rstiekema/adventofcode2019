@@ -45,7 +45,7 @@ class OrbitMap
 	
 	public function getAllParentObjects(string $object): array
 	{
-		$parentObjects = array();
+		$parentObjects = [];
 
 		while ($object = $this->getParentObject($object)) {
 			$parentObjects[] = $object;
