@@ -2,8 +2,8 @@
 
 chdir(__DIR__);
 
-require __DIR__.'/lib/intcomputer/IntComputer.php';
-require __DIR__.'/lib/intcomputer/Memory.php';
-require __DIR__.'/lib/intcomputer/Instruction.php';
-require __DIR__.'/lib/intcomputer/Opcode.php';
-require __DIR__.'/lib/intcomputer/Parameter.php';
+require __DIR__.'/lib/intcodecomputer/IntcodeComputer.php';
+require __DIR__.'/lib/intcodecomputer/Memory.php';
+require __DIR__.'/lib/intcodecomputer/Instruction.php';
+require __DIR__.'/lib/intcodecomputer/Opcode.php';
+require __DIR__.'/lib/intcodecomputer/Parameter.php';
