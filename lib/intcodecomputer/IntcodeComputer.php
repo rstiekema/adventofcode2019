@@ -7,54 +7,66 @@ class IntcodeComputer
 	/**
 	 * @var Memory
 	 */
-	private $program;
+	private $memory;
 	
 	/**
 	 * @var array
 	 */
 	private $output = [];
+	private $lastOutput = 0;
 	
 	/**
-     * Has the program stopped?
-     * @var bool
-     */
+	 * @var array
+	 */
+	private $input = [];
+	
+	public $started = false;
+	private $paused = false;
 	private $stopped = false;
+	
+	/**
+	* @var callable
+	 */
+	private $outputCallback;
+	
+	/**
+	 * @var string|int
+	 */
+	public $identifier;
+	
+	
+	private $currentPointer = 0;
 	
 	
 	public function __construct(Memory $memory)
 	{
-		$this->program = $memory;
+		$this->memory = $memory;
 	}
 	
 	
 	public function run()
 	{
-		$pointer = 0;
+		$this->paused = false;
+		$this->started = true;
 		
 		do {
-			$instruction = new Instruction($this->program, $this);
-			$instruction->process($pointer);
-			$pointer = $instruction->getFinalAddress();
+			$instruction = new Instruction($this->memory, $this);
+			$instruction->process($this->currentPointer);
+			$this->currentPointer = $instruction->getFinalAddress();
 			
-		} while ($this->program->read($pointer) !== null && !$this->stopped);
+			if (!empty($this->output) && $this->outputCallback !== null) {
+				$output = array_shift($this->output);
+				call_user_func($this->outputCallback, $output);
+			}
+			
+		} while ($this->memory->read($this->currentPointer) !== null && !$this->stopped && !$this->paused);
 	}
 	
 	
-	public function askInput(string $text): int
+	public function pause()
 	{
-		do {
-			echo $text.': ';
-			$input = trim(fgets(STDIN));
-			
-		} while ($input === '');
-		
-		return (int)$input;
-	}
-	
-	
-	public function addOutput(int $output): void
-	{
-		$this->output[] = $output;
+		$this->started = false;
+		$this->paused = true;
 	}
 	
 	
@@ -64,9 +76,44 @@ class IntcodeComputer
 	}
 	
 	
+	public function addInput($input): void
+	{
+		$this->input[] = $input;
+	}
+	
+	
+	public function askInput(string $text): int
+	{
+		$input = array_shift($this->input);
+		
+		if ($input === null) {
+			do {
+				echo $text.': ';
+				$input = trim(fgets(STDIN));
+				
+			} while ($input === '');
+		}
+		
+		return (int)$input;
+	}
+	
+	
+	public function addOutput(int $output): void
+	{
+		$this->output[] = $output;
+		$this->lastOutput = $output;
+	}
+	
+	
+	public function setOutputCallback(callable $function)
+	{
+		$this->outputCallback = $function;
+	}
+	
+	
 	public function getOutput()
 	{
-		return join(',', $this->output);
+		return !empty($this->output) ? join(',', $this->output) : $this->lastOutput;
 	}
 	
 }
