@@ -1,8 +1,8 @@
 <?php
 
-namespace IntComputer;
+namespace IntcodeComputer;
 
-class IntComputer
+class IntcodeComputer
 {
 	/**
 	 * @var Memory

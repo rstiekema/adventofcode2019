@@ -24,8 +24,8 @@ $input    = "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,
 $input = file_get_contents('resources/day05.txt');
 
 
-$memory = new \IntComputer\Memory(explode(",", $input));
-$computer = new \IntComputer\IntComputer($memory);
+$memory = new \IntcodeComputer\Memory(explode(",", $input));
+$computer = new \IntcodeComputer\IntcodeComputer($memory);
 $computer->run();
 
 

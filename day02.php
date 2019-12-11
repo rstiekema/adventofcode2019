@@ -19,12 +19,12 @@ for ($noun = 0; $noun <= 99; $noun++) {
 
 
 function getIntComputerResult($input, $noun, $verb) {
-	$memory = new \IntComputer\Memory($input);
+	$memory = new \IntcodeComputer\Memory($input);
 	
 	$memory->write(1, $noun);
 	$memory->write(2, $verb);
 	
-	$computer = new \IntComputer\IntComputer($memory);
+	$computer = new \IntcodeComputer\IntcodeComputer($memory);
 	$computer->run();
 	
 	return $memory->read(0);

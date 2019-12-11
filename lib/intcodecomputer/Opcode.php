@@ -1,6 +1,6 @@
 <?php
 
-namespace IntComputer;
+namespace IntcodeComputer;
 
 class Opcode
 {

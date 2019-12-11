@@ -1,6 +1,6 @@
 <?php
 
-namespace IntComputer;
+namespace IntcodeComputer;
 
 class Instruction
 {
@@ -8,7 +8,7 @@ class Instruction
 	private $computer;
 	private $finalAddress = 0;
 	
-	public function __construct(Memory $memory, IntComputer $computer)
+	public function __construct(Memory $memory, IntcodeComputer $computer)
 	{
 		$this->memory = $memory;
 		$this->computer = $computer;
