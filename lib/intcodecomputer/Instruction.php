@@ -27,74 +27,55 @@ class Instruction
 			$paramAddresses[$i] = $paramAddress;
 		}
 		
-		echo "address $address [$firstInstructionValue]: ";
-		
 		switch (Opcode::getOpcode($firstInstructionValue))
 		{
 			case Opcode::OPCODE_ADD:
-				$writeAddress = $this->memory->read($address + 3);
-				echo "writing [{$paramAddresses[1]}]{$paramValues[1]} + [{$paramAddresses[2]}]{$paramValues[2]} to address $writeAddress\n";
+				$this->memory->write($paramAddresses[3], $paramValues[1] + $paramValues[2]);
 				$this->finalAddress = $address + 4;
-				$this->memory->write($writeAddress, $paramValues[1] + $paramValues[2]);
 				break;
 				
 			case Opcode::OPCODE_MULTIPLY:
-				$writeAddress = $this->memory->read($address + 3);
-				echo "writing [{$paramAddresses[1]}]{$paramValues[1]} * [{$paramAddresses[2]}]{$paramValues[2]} to address $writeAddress\n";
+				$this->memory->write($paramAddresses[3], $paramValues[1] * $paramValues[2]);
 				$this->finalAddress = $address + 4;
-				$this->memory->write($writeAddress, $paramValues[1] * $paramValues[2]);
 				break;
 				
 			case Opcode::OPCODE_INPUT:
-				$writeAddress = $this->memory->read($address + 1);
-				echo "writing input to address $writeAddress\n";
+				$this->memory->write($paramAddresses[1], $this->computer->askInput("Please enter your input"));
 				$this->finalAddress = $address + 2;
-				$this->memory->write($writeAddress, $this->computer->askInput("Please enter your input"));
 				break;
 				
 			case Opcode::OPCODE_OUTPUT:
-				echo "adding output [{$paramAddresses[1]}]{$paramValues[1]}\n";
-				$this->finalAddress = $address + 2;
 				$this->computer->addOutput($paramValues[1]);
+				$this->finalAddress = $address + 2;
 				break;
 				
 			case Opcode::OPCODE_JUMPIFTRUE:
-				echo "jumping to [{$paramAddresses[2]}]{$paramValues[2]} if [{$paramAddresses[1]}]{$paramValues[1]} != 0\n";
 				$this->finalAddress = $paramValues[1] != 0 ? $paramValues[2] : $address + 3;
 				break;
 				
 			case Opcode::OPCODE_JUMPIFFALSE:
-				echo "jumping to [{$paramAddresses[2]}]{$paramValues[2]} if [{$paramAddresses[1]}]{$paramValues[1]} == 0\n";
 				$this->finalAddress = $paramValues[1] == 0 ? $paramValues[2] : $address + 3;
 				break;
 				
 			case Opcode::OPCODE_LESSTHAN:
-				$writeAddress = $this->memory->read($address + 3);
-				echo "writing 1 if [{$paramAddresses[1]}]{$paramValues[1]} < [{$paramAddresses[2]}]{$paramValues[2]}, else 0 to address $writeAddress\n";
+				$this->memory->write($paramAddresses[3], $paramValues[1] < $paramValues[2] ? 1 : 0);
 				$this->finalAddress = $address + 4;
-				$this->memory->write($writeAddress, $paramValues[1] < $paramValues[2] ? 1 : 0);
 				break;
 				
 			case Opcode::OPCODE_EQUALS:
-				$writeAddress = $this->memory->read($address + 3);
-				echo "writing 1 if [{$paramAddresses[1]}]{$paramValues[1]} = [{$paramAddresses[2]}]{$paramValues[2]}, else 0 to address $writeAddress\n";
+				$this->memory->write($paramAddresses[3], $paramValues[1] == $paramValues[2] ? 1 : 0);
 				$this->finalAddress = $address + 4;
-				$this->memory->write($writeAddress, $paramValues[1] == $paramValues[2] ? 1 : 0);
 				break;
 				
-			case Opcode::ADJUST_RELATIVEBASE:
-				echo "adjust relative base by [{$paramAddresses[1]}]{$paramValues[1]}\n";
-				$this->finalAddress = $address + 2;
+			case Opcode::OPCODE_ADJUSTRELATIVEBASE:
 				$this->computer->addRelativeBase($paramValues[1]);
+				$this->finalAddress = $address + 2;
 				break;
 				
 			case Opcode::OPCODE_EXIT:
-				echo "exit\n";
 				$this->computer->exit();
 				break;
 		}
-		
-//		echo "current memory state: ".substr($this->memory, 0, 150)."...\n";
 	}
 	
 	

@@ -101,7 +101,6 @@ class IntcodeComputer
 	
 	public function addOutput(int $output): void
 	{
-		echo "adding output $output\n";
 		$this->output[] = $output;
 		$this->lastOutput = $output;
 	}

@@ -20,7 +20,6 @@ $program = explode(',', file_get_contents('resources/day09.txt'));
 
 $memory   = new \IntcodeComputer\Memory($program);
 $computer = new \IntcodeComputer\IntcodeComputer($memory);
-
 $computer->run();
 
 echo "Output: ".$computer->getOutput()."\n";

@@ -21,7 +21,6 @@ class Memory
 	
 	public function write($address, int $value)
 	{
-//        echo "writing $value to address $address\n";
 		$this->memory[$address] = $value;
 	}
 	
