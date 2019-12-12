@@ -66,14 +66,57 @@ class SpaceImage
 }
 
 
+
+class LayerMerger
+{
+	
+	private $merged = [];
+	
+	
+	public function addLayer(Layer $layer): void
+	{
+		/**
+		 * @var Pixel $pixel
+		 */
+		
+		foreach ($layer->getLines() as $lineKey => $line) {
+			foreach ($line as $pixelKey => $pixel) {
+				if (!isset($this->merged[$lineKey][$pixelKey]) || $this->merged[$lineKey][$pixelKey]->getType() == Pixel::TYPE_TRANSPARENT) {
+					$this->merged[$lineKey][$pixelKey] = $pixel;
+				}
+			}
+		}
+	}
+	
+	
+	public function getMergedLines(): array
+	{
+		$lines = [];
+		
+		foreach ($this->merged as $pixels) {
+			$line = '';
+			
+			foreach ($pixels as $pixel) {
+				$line .= $pixel;
+			}
+			
+			$lines[] = $line;
+		}
+		
+		return $lines;
+	}
+}
+
+
+
 class Layer
 {
-	private $lines = [];
+	private $lineData = [];
 	
 	
-	public function __construct(array $lines)
+	public function __construct(array $lineData)
 	{
-		$this->lines = $lines;
+		$this->lineData = $lineData;
 	}
 	
 	
@@ -81,7 +124,7 @@ class Layer
 	{
 		$total = 0;
 		
-		foreach ($this->lines as $line) {
+		foreach ($this->lineData as $line) {
 			$total += substr_count($line, $digit);
 		}
 		
@@ -91,7 +134,19 @@ class Layer
 	
 	public function __toString()
 	{
-		return join("\n", $this->lines);
+		return join("\n", $this->lineData);
+	}
+	
+	
+	public function getLines()
+	{
+		$lines = [];
+		
+		foreach ($this->lineData as $pixelData) {
+			$lines[] = new Pixel($pixelData);
+		}
+		
+		return $lines;
 	}
 }
 
@@ -102,4 +157,31 @@ class Pixel
 	const COLOR_BLACK = 0;
 	const COLOR_WHITE = 1;
 	const COLOR_TRANSPARENT = 2;
+	
+	const TYPE_TRANSPARENT = 1;
+	const TYPE_COLOR = 2;
+	
+	private $color = 0;
+	
+	
+	public function __construct(int $color)
+	{
+		$this->color = $color;
+	}
+	
+	
+	public function getType()
+	{
+		if ($this->color == self::COLOR_TRANSPARENT) {
+			return self::TYPE_TRANSPARENT;
+		}
+		
+		return self::TYPE_COLOR;
+	}
+	
+	
+	public function __toString()
+	{
+		return (string)$this->color;
+	}
 }
