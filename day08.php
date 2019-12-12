@@ -1,17 +1,20 @@
 <?php
 
-$input = file_get_contents('resources/day08.txt');
+$input  = file_get_contents('resources/day08.txt');
+$width  = 25;
+$height = 6;
 
 
-$image = new SpaceImage(25, 6);
+$image = new SpaceImage($width, $height);
 $image->readStream($input);
 
-$layer = $image->getLayerContainingLowestDigitCount(0);
-
-
 echo count($image->getLayers())." layers found\n";
+
+$layer = $image->getLayerContainingLowestDigitCount(0);
 echo "Result of part 1: ".($layer->getDigitCount(1) * $layer->getDigitCount(2))."\n";
 
+$layer = $image->getMergedLayer();
+echo "Merged layer:\n$layer\n";
 
 
 
@@ -63,6 +66,18 @@ class SpaceImage
 		return $lowestLayer;
 	}
 	
+	
+	public function getMergedLayer(): Layer
+	{
+		$layerMerger = new LayerMerger();
+		
+		foreach ($this->getLayers() as $layer) {
+			$layerMerger->addLayer($layer);
+		}
+		
+		return $layerMerger->getMergedLayer();
+	}
+	
 }
 
 
@@ -81,7 +96,16 @@ class LayerMerger
 		
 		foreach ($layer->getLines() as $lineKey => $line) {
 			foreach ($line as $pixelKey => $pixel) {
-				if (!isset($this->merged[$lineKey][$pixelKey]) || $this->merged[$lineKey][$pixelKey]->getType() == Pixel::TYPE_TRANSPARENT) {
+				/**
+				 * @var Pixel $currentPixel
+				 */
+				$currentPixel = null;
+				
+				if (isset($this->merged[$lineKey][$pixelKey])) {
+					$currentPixel = $this->merged[$lineKey][$pixelKey];
+				}
+				
+				if ($currentPixel === null || $currentPixel->getType() == Pixel::TYPE_TRANSPARENT) {
 					$this->merged[$lineKey][$pixelKey] = $pixel;
 				}
 			}
@@ -89,7 +113,7 @@ class LayerMerger
 	}
 	
 	
-	public function getMergedLines(): array
+	public function getMergedLayer(): Layer
 	{
 		$lines = [];
 		
@@ -103,8 +127,9 @@ class LayerMerger
 			$lines[] = $line;
 		}
 		
-		return $lines;
+		return new Layer($lines);
 	}
+	
 }
 
 
@@ -120,7 +145,7 @@ class Layer
 	}
 	
 	
-	public function getDigitCount($digit)
+	public function getDigitCount($digit): int
 	{
 		$total = 0;
 		
@@ -132,22 +157,29 @@ class Layer
 	}
 	
 	
+	public function getLines(): array
+	{
+		$lines = [];
+		
+		foreach ($this->lineData as $lineData) {
+			$line = [];
+			
+			foreach (str_split($lineData) as $pixelData) {
+				$line[] = new Pixel($pixelData);
+			}
+			
+			$lines[] = $line;
+		}
+		
+		return $lines;
+	}
+	
+	
 	public function __toString()
 	{
 		return join("\n", $this->lineData);
 	}
 	
-	
-	public function getLines()
-	{
-		$lines = [];
-		
-		foreach ($this->lineData as $pixelData) {
-			$lines[] = new Pixel($pixelData);
-		}
-		
-		return $lines;
-	}
 }
 
 
@@ -170,7 +202,7 @@ class Pixel
 	}
 	
 	
-	public function getType()
+	public function getType(): int
 	{
 		if ($this->color == self::COLOR_TRANSPARENT) {
 			return self::TYPE_TRANSPARENT;
@@ -182,6 +214,12 @@ class Pixel
 	
 	public function __toString()
 	{
-		return (string)$this->color;
+		$colorMap = [
+			self::COLOR_BLACK => "\033[40m \e[0m",
+			self::COLOR_WHITE => "\033[47m \e[0m",
+		];
+		
+		return isset($colorMap[$this->color]) ? $colorMap[$this->color] : ' ';
 	}
+	
 }
