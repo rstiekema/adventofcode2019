@@ -36,6 +36,7 @@ class IntcodeComputer
 	
 	
 	private $currentPointer = 0;
+	private $relativeBase = 0;
 	
 	
 	public function __construct(Memory $memory)
@@ -100,14 +101,27 @@ class IntcodeComputer
 	
 	public function addOutput(int $output): void
 	{
+		echo "adding output $output\n";
 		$this->output[] = $output;
 		$this->lastOutput = $output;
 	}
 	
 	
-	public function setOutputCallback(callable $function)
+	public function setOutputCallback(callable $function): void
 	{
 		$this->outputCallback = $function;
+	}
+	
+	
+	public function addRelativeBase(int $positions): void
+	{
+		$this->relativeBase += $positions;
+	}
+	
+	
+	public function getRelativeBase(): int
+	{
+		return $this->relativeBase;
 	}
 	
 	

@@ -6,6 +6,7 @@ class Parameter
 {
 	const MODE_LOCATION  = 0;
 	const MODE_IMMEDIATE = 1;
+	const MODE_RELATIVE  = 2;
 	
 	
 	public static function getMode(int $firstInstructionValue, int $parameter)

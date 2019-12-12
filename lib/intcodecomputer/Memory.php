@@ -13,9 +13,9 @@ class Memory
 	}
 	
 	
-	public function read($address):? int
+	public function read($address): int
 	{
-		return isset($this->memory[$address]) ? $this->memory[$address] : null;
+		return isset($this->memory[$address]) ? $this->memory[$address] : 0;
 	}
 	
 	
