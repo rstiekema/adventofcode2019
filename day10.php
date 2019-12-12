@@ -74,17 +74,17 @@ $input = file_get_contents('resources/day10.txt');
 
 
 
-$map     = new AstroidMap($input);
-$astroid = $map->getBestLocationAstroid();
+$map     = new AsteroidMap($input);
+$asteroid = $map->getBestLocationAsteroid();
 
-echo "Best location astroid: {$astroid->getCoordinates()} (".count($map->getVisibleAstroidsFrom($astroid))." visible astroids from this point)\n";
-
-
+echo "Best location asteroid: {$asteroid->getCoordinates()} (".count($map->getVisibleAsteroidsFrom($asteroid))." visible asteroids from this point)\n";
 
 
-class AstroidMap
+
+
+class AsteroidMap
 {
-	private $astroids = [];
+	private $asteroids = [];
 	
 	
 	public function __construct($input)
@@ -92,66 +92,66 @@ class AstroidMap
 		foreach (explode("\n", $input) as $y => $row) {
 			foreach (str_split($row) as $x => $point) {
 				if ($point == '#') {
-					$this->astroids[] = new Astroid($x, $y);
+					$this->asteroids[] = new Asteroid($x, $y);
 				}
 			}
 		}
 	}
 	
 	
-	public function getBestLocationAstroid(): Astroid
+	public function getBestLocationAsteroid(): Asteroid
 	{
 		/**
-		 * @var Astroid $bestLocationAstroid
-		 * @var Astroid $sourceAstroid
+		 * @var Asteroid $bestLocationAsteroid
+		 * @var Asteroid $sourceAsteroid
 		 */
-		$bestLocationAstroid = null;
+		$bestLocationAsteroid = null;
 		$maxVisibleLocations = 0;
 		
-		foreach ($this->astroids as $sourceAstroid) {
-			$visibleAstroids = $this->getVisibleAstroidsFrom($sourceAstroid);
+		foreach ($this->asteroids as $sourceAsteroid) {
+			$visibleAsteroids = $this->getVisibleAsteroidsFrom($sourceAsteroid);
 			
-			if (count($visibleAstroids) > $maxVisibleLocations) {
-				$maxVisibleLocations = count($visibleAstroids);
-				$bestLocationAstroid = $sourceAstroid;
+			if (count($visibleAsteroids) > $maxVisibleLocations) {
+				$maxVisibleLocations = count($visibleAsteroids);
+				$bestLocationAsteroid = $sourceAsteroid;
 			}
 		}
 		
-		return $bestLocationAstroid;
+		return $bestLocationAsteroid;
 	}
 	
 	
 	
-	public function getVisibleAstroidsFrom(Astroid $astroid): array
+	public function getVisibleAsteroidsFrom(Asteroid $asteroid): array
 	{
-		$x = $astroid->getX();
-		$y = $astroid->getY();
+		$x = $asteroid->getX();
+		$y = $asteroid->getY();
 		
-		$astroids = [];
+		$asteroids = [];
 		
-		foreach ($this->sortAstroidsByDistance($this->astroids, $x, $y) as $targetAstroid) {
-			$angle = $targetAstroid->getAngleFrom($x, $y);
+		foreach ($this->sortAsteroidsByDistance($this->asteroids, $x, $y) as $targetAsteroid) {
+			$angle = $targetAsteroid->getAngleFrom($x, $y);
 			
-			if ($targetAstroid->getX() == $x && $targetAstroid->getY() == $y) {
+			if ($targetAsteroid->getX() == $x && $targetAsteroid->getY() == $y) {
 				continue;
 			}
 			
-			if (!isset($astroids[(string)$angle])) {
-				$astroids[(string)$angle] = $targetAstroid;
+			if (!isset($asteroids[(string)$angle])) {
+				$asteroids[(string)$angle] = $targetAsteroid;
 			}
 		}
 		
-		return $astroids;
+		return $asteroids;
 	}
 	
 	
 	
-	private function sortAstroidsByDistance(array $astroids, int $fromX, int $fromY): array
+	private function sortAsteroidsByDistance(array $asteroids, int $fromX, int $fromY): array
 	{
-		uasort($astroids, function($a, $b) use ($fromX, $fromY) {
+		uasort($asteroids, function($a, $b) use ($fromX, $fromY) {
 			/**
-			 * @var Astroid $a
-			 * @var Astroid $b
+			 * @var Asteroid $a
+			 * @var Asteroid $b
 			 */
 			$distanceA = $a->getDistanceFrom($fromX, $fromY);
 			$distanceB = $b->getDistanceFrom($fromX, $fromY);
@@ -160,18 +160,18 @@ class AstroidMap
 			return $distanceA < $distanceB ? -1 : 1;
 		});
 		
-		return $astroids;
+		return $asteroids;
 	}
 	
 	
-	public function getAstroids()
+	public function getAsteroids()
 	{
-		return $this->astroids;
+		return $this->asteroids;
 	}
 }
 
 
-class Astroid
+class Asteroid
 {
 	private $x;
 	private $y;
