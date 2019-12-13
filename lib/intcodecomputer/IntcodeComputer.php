@@ -25,8 +25,9 @@ class IntcodeComputer
 	private $stopped = false;
 	
 	/**
-	* @var callable
+	 * @var callable
 	 */
+	private $inputCallback;
 	private $outputCallback;
 	
 	/**
@@ -87,6 +88,10 @@ class IntcodeComputer
 	{
 		$input = array_shift($this->input);
 		
+		if (!empty($this->inputCallback)) {
+			$input = call_user_func($this->inputCallback);
+		}
+		
 		if ($input === null) {
 			do {
 				echo $text.': ';
@@ -106,9 +111,15 @@ class IntcodeComputer
 	}
 	
 	
-	public function setOutputCallback(callable $function): void
+	public function setInputCallback($callback): void
 	{
-		$this->outputCallback = $function;
+		$this->inputCallback = $callback;
+	}
+	
+	
+	public function setOutputCallback($callback): void
+	{
+		$this->outputCallback = $callback;
 	}
 	
 	
