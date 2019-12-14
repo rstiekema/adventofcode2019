@@ -9,6 +9,7 @@ $steps = 1000;
 //<x=4, y=-8, z=8>
 //<x=3, y=5, z=-1>";
 //$steps = 10;
+// 2772 steps
 
 
 //$input = "<x=-8, y=-10, z=0>
@@ -16,16 +17,57 @@ $steps = 1000;
 //<x=2, y=-7, z=3>
 //<x=9, y=-8, z=-3>";
 //$steps = 100;
+// 4686774924 steps
 
 
 
+
+// Part 1
 $simulator = new MoonMotionSimulator($input);
 
 for ($i = 1; $i <= $steps; $i++) {
 	$simulator->step();
 }
 
-echo "Total energy: ".$simulator->getEnergy()."\n";
+echo "Total energy after $steps steps: ".$simulator->getEnergy()."\n";
+
+
+
+
+// Part 2
+$simulator = new MoonMotionSimulator($input);
+$axisSteps = [
+	'x' => 0,
+	'y' => 0,
+	'z' => 0
+];
+$initialAxisCoords = [
+	'x' => $simulator->getAllAxisCoords('x'),
+	'y' => $simulator->getAllAxisCoords('y'),
+	'z' => $simulator->getAllAxisCoords('z'),
+];
+
+do {
+	$simulator->step();
+	
+	$currentStep = $simulator->getCurrentStep();
+	
+	foreach (['x', 'y', 'z'] as $axis) {
+		if ($axisSteps[$axis] > 0) {
+			continue;
+		}
+		
+		if ($simulator->getAllAxisCoords($axis) == $initialAxisCoords[$axis]) {
+			$axisSteps[$axis] = $currentStep;
+		}
+	}
+	
+} while (min($axisSteps) == 0);
+
+$lcm = ($axisSteps['x'] * $axisSteps['y']) / gmp_gcd($axisSteps['x'], $axisSteps['y']);
+$lcm = ($lcm * $axisSteps['z']) / gmp_gcd($lcm, $axisSteps['z']);
+
+echo "Total steps to get the same moons positions state: $lcm\n";
 
 
 
@@ -34,6 +76,7 @@ class MoonMotionSimulator
 {
 	private $moons = [];
 	private $moonPairs = [];
+	private $currentStep = 0;
 	
 	
 	public function __construct($moonData)
@@ -70,12 +113,32 @@ class MoonMotionSimulator
 			$moon->applyVelocity();
 		}
 		
+		$this->currentStep++;
 	}
 	
 	
 	public function getMoons(): array
 	{
 		return $this->moons;
+	}
+	
+	
+	public function getAllAxisCoords($axis): string
+	{
+		$coords = [];
+		
+		foreach ($this->getMoons() as $moon) {
+			$coords[] = $moon->getPosition()->get($axis);
+			$coords[] = $moon->getVelocity()->get($axis);
+		}
+		
+		return join(',', $coords);
+	}
+	
+	
+	public function getCurrentStep(): int
+	{
+		return $this->currentStep;
 	}
 	
 	
@@ -185,8 +248,12 @@ class Moon
 	
 	public function __toString()
 	{
-		return "pos=<x=".str_pad($this->getPosition()->get('x'), 3, ' ', STR_PAD_LEFT).", y=".str_pad($this->getPosition()->get('y'), 3, ' ', STR_PAD_LEFT).", z=".str_pad($this->getPosition()->get('z'), 3, ' ', STR_PAD_LEFT).">, ".
-			"vel=<x=".str_pad($this->getVelocity()->get('x'), 3, ' ', STR_PAD_LEFT).", y=".str_pad($this->getVelocity()->get('y'), 3, ' ', STR_PAD_LEFT).", z=".str_pad($this->getVelocity()->get('z'), 3, ' ', STR_PAD_LEFT).">";
+		return 	"pos=<x=".str_pad($this->getPosition()->get('x'), 3, ' ', STR_PAD_LEFT).
+					", y=".str_pad($this->getPosition()->get('y'), 3, ' ', STR_PAD_LEFT).
+					", z=".str_pad($this->getPosition()->get('z'), 3, ' ', STR_PAD_LEFT).">, ".
+				"vel=<x=".str_pad($this->getVelocity()->get('x'), 3, ' ', STR_PAD_LEFT).
+					", y=".str_pad($this->getVelocity()->get('y'), 3, ' ', STR_PAD_LEFT).
+					", z=".str_pad($this->getVelocity()->get('z'), 3, ' ', STR_PAD_LEFT).">";
 	}
 }
 
